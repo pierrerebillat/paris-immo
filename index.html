@@ -1351,7 +1351,7 @@ const firebaseConfig = {
   messagingSenderId: "305267172723",
   appId: "1:305267172723:web:8b457a1bb4a7850f5d1106"
 };
-const VAPID_KEY = "TA_VAPID_KEY_ICI";
+const VAPID_KEY = "BIZlXjcxGfwahyf7yXDJZYdw2dOatsK5xpr-jW33t6vXFD3i7o8fqeZ7xRCFhwXOkCGhdEhzX8h8JXKKiDJa0cM";
 
 async function initNotifications() {
   // Vérification support navigateur
@@ -1484,7 +1484,7 @@ function showInAppAlert(title, body, url) {
 }
 
 // Lancement auto des notifications si config Firebase remplie
-if (FIREBASE_CONFIG.apiKey !== 'TON_API_KEY') {
+if (FIREBASE_CONFIG.apiKey !== 'AIzaSyBUJUwmAALNCtlqKmz1FTBUew9Rv_0rEWo') {
   initNotifications();
 } else {
   console.log('ℹ️ Configure Firebase dans paris-immo.html pour activer les notifications push.');
