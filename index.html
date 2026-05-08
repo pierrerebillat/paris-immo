@@ -1484,7 +1484,7 @@ function showInAppAlert(title, body, url) {
 }
 
 // Lancement auto des notifications si config Firebase remplie
-if (FIREBASE_CONFIG.apiKey !== 'AIzaSyBUJUwmAALNCtlqKmz1FTBUew9Rv_0rEWo') {
+if (FIREBASE_CONFIG.apiKey !== 'TON_API_KEY') {
   initNotifications();
 } else {
   console.log('ℹ️ Configure Firebase dans paris-immo.html pour activer les notifications push.');
