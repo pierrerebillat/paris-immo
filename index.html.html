@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<title>Paris Immo · Alertes</title>
+<link rel="manifest" href="#" crossorigin="use-credentials">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f5f2ee;
+    --surface: #ffffff;
+    --surface2: #f0ece6;
+    --ink: #1a1a1a;
+    --ink2: #6b6560;
+    --ink3: #a09a94;
+    --accent: #c8a96e;
+    --accent2: #8b6a3e;
+    --green: #3d7a5e;
+    --red: #c0392b;
+    --border: #e8e2da;
+    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    color: white;
+    padding: 52px 24px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(200,169,110,0.12);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 60px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(200,169,110,0.08);
+  }
+  .header-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: white;
+  }
+  .header-title span {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .header-sub {
+    margin-top: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 300;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    background: var(--ink);
+    padding: 0 24px 20px;
+    display: flex;
+    gap: 12px;
+  }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab {
+    flex: 1;
+    padding: 14px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  /* SECTIONS */
+  .section { display: none; padding: 20px 16px 100px; }
+  .section.active { display: block; }
+
+  /* ANNONCES */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .badge {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* FILTER BAR */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    white-space: nowrap;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--ink2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-chip.active {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s;
+    animation: fadeIn 0.4s ease both;
+  }
+  .card:active { transform: scale(0.98); }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PHOTO */
+  .card-photo {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: var(--surface2);
+  }
+  .card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .card:active .card-photo img { transform: scale(1.03); }
+  .card-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.45) 100%);
+  }
+  .card-photo-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    display: flex;
+    gap: 6px;
+  }
+  .photo-source-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    border-radius: 20px;
+    padding: 4px 10px;
+  }
+  .photo-source-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+  .photo-source-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.5px;
+  }
+  .photo-new-badge {
+    background: var(--green);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .card-photo-price {
+    position: absolute;
+    bottom: 10px; right: 12px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 5px 12px;
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .card-photo-price span {
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    opacity: 0.75;
+  }
+  .photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    background: linear-gradient(135deg, var(--surface2) 0%, var(--border) 100%);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 16px 0;
+  }
+  .card-source {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .source-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .source-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink3);
+    letter-spacing: 0.5px;
+  }
+  .card-new {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    background: rgba(61,122,94,0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .card-title {
+    padding: 10px 16px 4px;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .card-addr {
+    padding: 0 16px;
+    font-size: 12px;
+    color: var(--ink3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-specs {
+    display: flex;
+    gap: 0;
+    padding: 12px 16px;
+  }
+  .spec {
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .spec:last-child { border-right: none; }
+  .spec-val {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+  }
+  .spec-lbl {
+    font-size: 10px;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .card-price {
+    margin: 0 16px 12px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .price-main {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--accent2);
+    font-family: 'Playfair Display', serif;
+  }
+  .price-unit {
+    font-size: 13px;
+    color: var(--ink3);
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    padding: 0 16px 12px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--surface2);
+    color: var(--ink2);
+    font-weight: 500;
+  }
+  .tag.highlight {
+    background: rgba(200,169,110,0.15);
+    color: var(--accent2);
+  }
+
+  .card-footer {
+    border-top: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-date {
+    font-size: 11px;
+    color: var(--ink3);
+  }
+  .card-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.15s;
+  }
+  .btn-fav {
+    background: var(--surface2);
+    color: var(--ink3);
+  }
+  .btn-fav.active { background: rgba(200,169,110,0.2); color: var(--accent2); }
+  .btn-open {
+    background: var(--ink);
+    color: white;
+  }
+
+  .card-metro {
+    padding: 4px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .metro-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #003f8c;
+    color: white;
+    font-size: 9px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-style: italic;
+    letter-spacing: -0.5px;
+  }
+  .metro-name {
+    font-size: 12px;
+    color: var(--ink2);
+    font-weight: 500;
+  }
+  .metro-line {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .metro-dist {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-left: 2px;
+  }
+  .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--ink3);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 16px; font-weight: 500; color: var(--ink2); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; line-height: 1.5; }
+
+  /* CRITERES */
+  .criteria-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .criteria-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .criteria-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .criteria-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .criteria-lbl {
+    font-size: 13px;
+    color: var(--ink2);
+  }
+  .criteria-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    max-width: 55%;
+  }
+
+  .arr-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .arr-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--surface2);
+    color: var(--ink2);
+    font-weight: 500;
+  }
+
+  /* SOURCES */
+  .source-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .source-row:last-child { border-bottom: none; }
+  .source-info { display: flex; align-items: center; gap: 10px; }
+  .source-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .source-detail { }
+  .source-title { font-size: 13px; font-weight: 600; }
+  .source-count { font-size: 11px; color: var(--ink3); margin-top: 1px; }
+  .toggle {
+    width: 44px; height: 24px;
+    border-radius: 12px;
+    background: var(--border);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--green); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    top: 3px; left: 3px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle.on::after { left: 23px; }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 2px;
+  }
+  .stat-card.accent-card {
+    background: var(--ink);
+    grid-column: span 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat-card.accent-card .stat-val,
+  .stat-card.accent-card .stat-lbl { color: white; }
+  .stat-card.accent-card .stat-lbl { color: rgba(255,255,255,0.5); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 8px 0 20px;
+    z-index: 200;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 0;
+    cursor: pointer;
+    color: var(--ink3);
+    transition: color 0.15s;
+  }
+  .nav-item.active { color: var(--ink); }
+  .nav-icon { font-size: 22px; position: relative; }
+  .nav-badge {
+    position: absolute;
+    top: -4px; right: -8px;
+    background: var(--red);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-lbl { font-size: 10px; font-weight: 500; }
+
+  /* REFRESH BTN */
+  .refresh-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.15s;
+  }
+  .refresh-btn:active { opacity: 0.8; }
+  .spinning { animation: spin 1s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .last-sync {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink3);
+    margin-bottom: 20px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 24px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* GAS SETUP */
+  .setup-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content {}
+  .step-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .step-desc { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+  .step-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--accent2);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .code-block {
+    background: var(--ink);
+    color: #a8d8a8;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 11px;
+    word-break: break-all;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-label">Recherche en cours</div>
+  <div class="header-title">Paris <span>Immo</span></div>
+  <div class="header-sub">Alertes temps réel · 6 sources · toutes les 15 min</div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-pill">
+    <div class="status-dot"></div>
+    <span>Actif</span>
+  </div>
+  <div class="status-pill">⏱ Toutes les 15 min</div>
+  <div class="status-pill">📋 <span id="total-count">12</span> annonces</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('annonces', this)">Annonces</div>
+  <div class="tab" onclick="switchTab('favoris', this)">Favoris</div>
+  <div class="tab" onclick="switchTab('criteres', this)">Critères</div>
+  <div class="tab" onclick="switchTab('config', this)">Config</div>
+</div>
+
+<!-- ANNONCES -->
+<div id="tab-annonces" class="section active">
+  <div class="section-header">
+    <div class="section-title">Annonces</div>
+    <span class="badge" id="new-badge">3 nouvelles</span>
+  </div>
+
+  <div class="filters">
+    <div class="filter-chip active" onclick="filterCards('all', this)">Toutes</div>
+    <div class="filter-chip" onclick="filterCards('pap', this)">PAP</div>
+    <div class="filter-chip" onclick="filterCards('leboncoin', this)">LeBonCoin</div>
+    <div class="filter-chip" onclick="filterCards('laforet', this)">La Forêt</div>
+    <div class="filter-chip" onclick="filterCards('century21', this)">Century 21</div>
+    <div class="filter-chip" onclick="filterCards('orpi', this)">Orpi</div>
+    <div class="filter-chip" onclick="filterCards('logicimmo', this)">Logic-Immo</div>
+  </div>
+
+  <div id="cards-container"></div>
+</div>
+
+<!-- FAVORIS -->
+<div id="tab-favoris" class="section">
+  <div class="section-header">
+    <div class="section-title">Favoris</div>
+    <span class="badge" id="fav-badge">0</span>
+  </div>
+  <div id="fav-container">
+    <div class="empty">
+      <div class="empty-icon">🏠</div>
+      <div class="empty-title">Aucun favori</div>
+      <div class="empty-sub">Appuyez sur ♡ sur une annonce<br>pour la sauvegarder ici</div>
+    </div>
+  </div>
+</div>
+
+<!-- CRITERES -->
+<div id="tab-criteres" class="section">
+  <div class="section-header">
+    <div class="section-title">Mes critères</div>
+  </div>
+
+  <div class="criteria-card">
+    <div class="criteria-title">📍 Localisation</div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Ville</span>
+      <span class="criteria-val">Paris</span>
+    </div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Arrondissements</span>
+      <div>
+        <div class="arr-grid" style="justify-content:flex-end">
+          <span class="arr-pill">1er</span><span class="arr-pill">2e</span><span class="arr-pill">3e</span>
+          <span class="arr-pill">4e</span><span class="arr-pill">5e</span><span class="arr-pill">6e</span>
+          <span class="arr-pill">7e</span><span class="arr-pill">8e</span><span class="arr-pill">9e</span>
+          <span class="arr-pill">10e</span><span class="arr-pill">11e</span><span class="arr-pill">12e</span>
+          <span class="arr-pill">13e</span><span class="arr-pill">14e</span><span class="arr-pill">15e</span>
+          <span class="arr-pill">16e</span><span class="arr-pill">17e</span><span class="arr-pill">18e</span>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);text-align:right;margin-top:6px">Hors 19e et 20e</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria-card">
+    <div class="criteria-title">🏠 Logement</div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Type</span>
+      <span class="criteria-val">Appartement</span>
+    </div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Pièces</span>
+      <span class="criteria-val">2 pièces minimum</span>
+    </div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Surface</span>
+      <span class="criteria-val">40 m² minimum</span>
+    </div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Meublé</span>
+      <span class="criteria-val">Non (vide uniquement)</span>
+    </div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Parking</span>
+      <span class="criteria-val">Idéalement inclus</span>
+    </div>
+  </div>
+
+  <div class="criteria-card">
+    <div class="criteria-title">💶 Budget</div>
+    <div class="criteria-row">
+      <span class="criteria-lbl">Loyer maximum</span>
+      <span class="criteria-val" style="font-size:18px;font-family:'Playfair Display',serif;color:var(--accent2)">2 200 €/mois</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div id="tab-config" class="section">
+  <div class="section-header">
+    <div class="section-title">Configuration</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val" id="stat-total">12</div>
+      <div class="stat-lbl">Annonces trouvées</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="stat-new">3</div>
+      <div class="stat-lbl">Nouvelles aujourd'hui</div>
+    </div>
+    <div class="stat-card accent-card">
+      <div>
+        <div class="stat-val">Dernière synchro</div>
+        <div class="stat-lbl" id="stat-sync">—</div>
+      </div>
+      <span style="font-size:28px">🔄</span>
+    </div>
+  </div>
+
+  <div class="criteria-card">
+    <div class="criteria-title">🔌 Sources actives</div>
+    <div id="sources-list"></div>
+  </div>
+
+  <button class="refresh-btn" onclick="simulateRefresh()" id="refresh-btn">
+    <span>↻</span> Actualiser maintenant
+  </button>
+
+  <div class="last-sync" id="last-sync-text">Dernière synchro : jamais</div>
+
+  <div class="criteria-card">
+    <div class="criteria-title">⚙️ Script Google Apps Script</div>
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Créer un Google Sheet</div>
+        <div class="step-desc">Va sur Google Sheets et crée un nouveau classeur nommé <strong>"Paris Immo"</strong>. Note son ID dans l'URL.</div>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Ouvrir Apps Script</div>
+        <div class="step-desc">Dans le Sheet : <strong>Extensions → Apps Script</strong>. Colle le script fourni ci-dessous.</div>
+        <a href="https://script.google.com" class="step-link">↗ script.google.com</a>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Lancer le déclencheur toutes les 15 min</div>
+        <div class="step-desc">Dans Apps Script : <strong>Déclencheurs → + Ajouter</strong> → Événement temporel → Toutes les minutes → <strong>Toutes les 15 minutes</strong>.</div>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Connecter cette app</div>
+        <div class="step-desc">Colle l'ID de ton Google Sheet dans le champ ci-dessous pour que l'app lise les données en temps réel.</div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <input id="sheet-id-input" type="text" placeholder="ID du Google Sheet…" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--bg)">
+          <button onclick="saveSheetId()" style="padding:10px 14px;background:var(--ink);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria-card" style="margin-bottom:40px">
+    <div class="criteria-title">📥 Installer comme app</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6">
+      <strong>iPhone :</strong> Safari → Partager → "Sur l'écran d'accueil"<br><br>
+      <strong>Android :</strong> Chrome → ⋮ → "Ajouter à l'écran d'accueil"<br><br>
+      L'app se lancera comme une vraie application, sans barre de navigation.
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchSection('annonces', this)">
+    <div class="nav-icon">🏠<span class="nav-badge" id="nav-badge" style="display:none">3</span></div>
+    <div class="nav-lbl">Annonces</div>
+  </div>
+  <div class="nav-item" onclick="switchSection('favoris', this)">
+    <div class="nav-icon">♡</div>
+    <div class="nav-lbl">Favoris</div>
+  </div>
+  <div class="nav-item" onclick="switchSection('criteres', this)">
+    <div class="nav-icon">🎯</div>
+    <div class="nav-lbl">Critères</div>
+  </div>
+  <div class="nav-item" onclick="switchSection('config', this)">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-lbl">Config</div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const SOURCES = [
+  { id: 'pap', name: 'PAP.fr', color: '#2563eb', icon: 'P', count: '4 annonces' },
+  { id: 'leboncoin', name: 'LeBonCoin', color: '#f97316', icon: 'L', count: '3 annonces' },
+  { id: 'laforet', name: 'La Forêt', color: '#16a34a', icon: 'F', count: '2 annonces' },
+  { id: 'century21', name: 'Century 21', color: '#7c3aed', icon: 'C', count: '1 annonce' },
+  { id: 'orpi', name: 'Orpi', color: '#dc2626', icon: 'O', count: '1 annonce' },
+  { id: 'logicimmo', name: 'Logic-Immo', color: '#0891b2', icon: 'LI', count: '1 annonce' },
+];
+
+const MOCK_LISTINGS = [
+  {
+    id: 1, source: 'pap', isNew: true,
+    title: 'Bel appartement lumineux avec parquet',
+    address: '9e arr. · Rue de Navarin',
+    rooms: 3, surface: 58, price: 1850,
+    tags: ['Vide', '3e étage', 'Parquet', 'Double vitrage'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Saint-Georges', lines: [{num:'12', bg:'#007852', fg:'#fff'}], dist: '2 min à pied' },
+    date: "Aujourd'hui, 09:12", url: 'https://pap.fr'
+  },
+  {
+    id: 2, source: 'leboncoin', isNew: true,
+    title: 'T2 refait à neuf, calme et lumineux',
+    address: '17e arr. · Bd des Batignolles',
+    rooms: 2, surface: 44, price: 1680,
+    tags: ['Vide', 'RDC surélevé', 'Cave'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Place de Clichy', lines: [{num:'2', bg:'#003f8c', fg:'#fff'},{num:'13', bg:'#6ec4e8', fg:'#000'}], dist: '4 min à pied' },
+    date: "Aujourd'hui, 08:45", url: 'https://leboncoin.fr'
+  },
+  {
+    id: 3, source: 'laforet', isNew: true,
+    title: 'Grand 3P avec parking privatif',
+    address: '8e arr. · Rue de la Pépinière',
+    rooms: 3, surface: 72, price: 2150,
+    tags: ['Vide', 'Parking', 'Gardien', '2e étage'],
+    hasParking: true,
+    photo: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Saint-Lazare', lines: [{num:'3', bg:'#9f9825', fg:'#fff'},{num:'12', bg:'#007852', fg:'#fff'},{num:'13', bg:'#6ec4e8', fg:'#000'}], dist: '3 min à pied' },
+    date: "Aujourd'hui, 07:30", url: 'https://laforet.com'
+  },
+  {
+    id: 4, source: 'pap', isNew: false,
+    title: 'Appartement haussmannien 3 pièces',
+    address: '10e arr. · Rue du Faubourg Poissonnière',
+    rooms: 3, surface: 65, price: 1950,
+    tags: ['Vide', 'Moulures', 'Hauteur sous plafond', 'Parquet'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/2121121/pexels-photo-2121121.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Bonne Nouvelle', lines: [{num:'8', bg:'#d282be', fg:'#fff'},{num:'9', bg:'#cdb900', fg:'#000'}], dist: '3 min à pied' },
+    date: 'Hier, 18:22', url: 'https://pap.fr'
+  },
+  {
+    id: 5, source: 'century21', isNew: false,
+    title: 'T3 calme côté cour',
+    address: '15e arr. · Rue de Lourmel',
+    rooms: 3, surface: 55, price: 1780,
+    tags: ['Vide', 'Cour', '1er étage'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Lourmel', lines: [{num:'8', bg:'#d282be', fg:'#fff'}], dist: '1 min à pied' },
+    date: 'Hier, 15:10', url: 'https://century21.fr'
+  },
+  {
+    id: 6, source: 'orpi', isNew: false,
+    title: '2 pièces moderne, proche métro',
+    address: '12e arr. · Rue de Reuilly',
+    rooms: 2, surface: 41, price: 1490,
+    tags: ['Vide', 'Digicode', 'Interphone'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/3214064/pexels-photo-3214064.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Reuilly - Diderot', lines: [{num:'1', bg:'#f2c200', fg:'#000'},{num:'8', bg:'#d282be', fg:'#fff'}], dist: '2 min à pied' },
+    date: 'Hier, 11:05', url: 'https://orpi.com'
+  },
+  {
+    id: 7, source: 'logicimmo', isNew: false,
+    title: 'Grand T2 lumineux avec balcon',
+    address: '11e arr. · Rue Oberkampf',
+    rooms: 2, surface: 48, price: 1620,
+    tags: ['Vide', 'Balcon', '4e étage', 'Ascenseur'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/1428348/pexels-photo-1428348.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Parmentier', lines: [{num:'3', bg:'#9f9825', fg:'#fff'}], dist: '3 min à pied' },
+    date: 'Il y a 2 jours', url: 'https://logic-immo.com'
+  },
+  {
+    id: 8, source: 'pap', isNew: false,
+    title: 'Appartement 3P avec parking et cave',
+    address: '18e arr. · Rue Lepic',
+    rooms: 3, surface: 62, price: 2080,
+    tags: ['Vide', 'Parking', 'Cave', 'Vue dégagée'],
+    hasParking: true,
+    photo: 'https://images.pexels.com/photos/279746/pexels-photo-279746.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Blanche', lines: [{num:'2', bg:'#003f8c', fg:'#fff'}], dist: '2 min à pied' },
+    date: 'Il y a 2 jours', url: 'https://pap.fr'
+  },
+  {
+    id: 9, source: 'leboncoin', isNew: false,
+    title: 'Beau 2P, Montmartre, calme',
+    address: '18e arr. · Rue Caulaincourt',
+    rooms: 2, surface: 43, price: 1550,
+    tags: ['Vide', 'Parquet', '2e étage'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/1080696/pexels-photo-1080696.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Lamarck - Caulaincourt', lines: [{num:'12', bg:'#007852', fg:'#fff'}], dist: '1 min à pied' },
+    date: 'Il y a 3 jours', url: 'https://leboncoin.fr'
+  },
+  {
+    id: 10, source: 'pap', isNew: false,
+    title: 'T3 haussmannien avec cheminée',
+    address: '6e arr. · Rue de Buci',
+    rooms: 3, surface: 70, price: 2190,
+    tags: ['Vide', 'Cheminée', 'Parquet', 'Moulures'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/2029694/pexels-photo-2029694.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Mabillon', lines: [{num:'10', bg:'#c9910a', fg:'#fff'}], dist: '2 min à pied' },
+    date: 'Il y a 4 jours', url: 'https://pap.fr'
+  },
+  {
+    id: 11, source: 'leboncoin', isNew: false,
+    title: '2P refait, quartier Marais',
+    address: '4e arr. · Rue des Archives',
+    rooms: 2, surface: 42, price: 1720,
+    tags: ['Vide', 'Refait neuf', 'Cuisine équipée'],
+    hasParking: false,
+    photo: 'https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Rambuteau', lines: [{num:'11', bg:'#8d5e2a', fg:'#fff'}], dist: '3 min à pied' },
+    date: 'Il y a 5 jours', url: 'https://leboncoin.fr'
+  },
+  {
+    id: 12, source: 'laforet', isNew: false,
+    title: 'Appartement 2P avec box parking',
+    address: '13e arr. · Avenue d\'Italie',
+    rooms: 2, surface: 50, price: 1890,
+    tags: ['Vide', 'Parking', 'Box fermé', '5e étage'],
+    hasParking: true,
+    photo: 'https://images.pexels.com/photos/1669799/pexels-photo-1669799.jpeg?auto=compress&cs=tinysrgb&w=800',
+    metro: { name: 'Place d\'Italie', lines: [{num:'5', bg:'#f28e42', fg:'#fff'},{num:'6', bg:'#6eca97', fg:'#000'},{num:'7', bg:'#f3a4ba', fg:'#000'}], dist: '4 min à pied' },
+    date: 'Il y a 6 jours', url: 'https://laforet.com'
+  },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+let favorites = JSON.parse(localStorage.getItem('immo-favs') || '[]');
+let activeFilter = 'all';
+let toggleState = {};
+SOURCES.forEach(s => toggleState[s.id] = true);
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+
+function getSourceColor(id) {
+  return SOURCES.find(s => s.id === id)?.color || '#666';
+}
+
+function createCard(listing) {
+  const isFav = favorites.includes(listing.id);
+  const sourceName = SOURCES.find(s => s.id === listing.source)?.name || listing.source;
+  return `
+    <div class="card" data-source="${listing.source}" data-id="${listing.id}">
+      <div class="card-photo">
+        ${listing.photo
+          ? `<img src="${listing.photo}" alt="${listing.title}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'>🏠</div>'">`
+          : `<div class="photo-placeholder">🏠</div>`}
+        <div class="card-photo-overlay"></div>
+        <div class="card-photo-badge">
+          <div class="photo-source-badge">
+            <div class="photo-source-dot" style="background:${getSourceColor(listing.source)}"></div>
+            <span class="photo-source-name">${(SOURCES.find(s=>s.id===listing.source)?.name||listing.source).toUpperCase()}</span>
+          </div>
+          ${listing.isNew ? '<span class="photo-new-badge">✦ NOUVEAU</span>' : ''}
+        </div>
+        <div class="card-photo-price">${listing.price.toLocaleString('fr-FR')} € <span>/mois</span></div>
+      </div>
+      <div class="card-title">${listing.title}</div>
+      <div class="card-addr">📍 ${listing.address}</div>
+      ${listing.metro ? `
+      <div class="card-metro">
+        <div class="metro-icon">M</div>
+        ${listing.metro.lines.map(l => `<span class="metro-line" style="background:${l.bg};color:${l.fg}">${l.num}</span>`).join('')}
+        <span class="metro-name">${listing.metro.name}</span>
+        <span class="metro-dist">· ${listing.metro.dist}</span>
+      </div>` : ''}
+      <div class="card-specs">
+        <div class="spec">
+          <span class="spec-val">${listing.rooms}</span>
+          <span class="spec-lbl">Pièces</span>
+        </div>
+        <div class="spec">
+          <span class="spec-val">${listing.surface}</span>
+          <span class="spec-lbl">m²</span>
+        </div>
+        <div class="spec">
+          <span class="spec-val">${Math.round(listing.price / listing.surface)}</span>
+          <span class="spec-lbl">€/m²</span>
+        </div>
+      </div>
+      <div class="card-tags">
+        ${listing.tags.map(t => `<span class="tag ${t === 'Parking' ? 'highlight' : ''}">${t}</span>`).join('')}
+        ${listing.hasParking ? '<span class="tag highlight">🚗 Parking</span>' : ''}
+      </div>
+      <div class="card-footer">
+        <span class="card-date">${listing.date}</span>
+        <div class="card-actions">
+          <button class="btn-icon btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav(${listing.id}, this)">
+            ${isFav ? '♥' : '♡'}
+          </button>
+          <button class="btn-icon btn-open" onclick="window.open('${listing.url}','_blank')">↗</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCards(filter = 'all') {
+  const container = document.getElementById('cards-container');
+  const filtered = filter === 'all'
+    ? MOCK_LISTINGS
+    : MOCK_LISTINGS.filter(l => l.source === filter);
+  container.innerHTML = filtered.map(createCard).join('');
+
+  const newCount = filtered.filter(l => l.isNew).length;
+  document.getElementById('new-badge').textContent = newCount > 0 ? `${newCount} nouvelles` : 'À jour';
+  document.getElementById('total-count').textContent = MOCK_LISTINGS.length;
+}
+
+function renderSources() {
+  const container = document.getElementById('sources-list');
+  container.innerHTML = SOURCES.map(s => `
+    <div class="source-row">
+      <div class="source-info">
+        <div class="source-icon" style="background:${s.color}">${s.icon}</div>
+        <div class="source-detail">
+          <div class="source-title">${s.name}</div>
+          <div class="source-count">${s.count}</div>
+        </div>
+      </div>
+      <button class="toggle ${toggleState[s.id] ? 'on' : ''}" onclick="toggleSource('${s.id}', this)"></button>
+    </div>
+  `).join('');
+}
+
+function renderFavs() {
+  const container = document.getElementById('fav-container');
+  const favListings = MOCK_LISTINGS.filter(l => favorites.includes(l.id));
+  document.getElementById('fav-badge').textContent = favListings.length;
+  if (favListings.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🏠</div><div class="empty-title">Aucun favori</div><div class="empty-sub">Appuyez sur ♡ sur une annonce<br>pour la sauvegarder ici</div></div>`;
+  } else {
+    container.innerHTML = favListings.map(createCard).join('');
+  }
+}
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'favoris') renderFavs();
+}
+
+function switchSection(name, el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  const tabMap = { annonces: 0, favoris: 1, criteres: 2, config: 3 };
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  tabs[tabMap[name]].classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'favoris') renderFavs();
+}
+
+function filterCards(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderCards(filter);
+}
+
+function toggleFav(id, btn) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(f => f !== id);
+    btn.classList.remove('active');
+    btn.textContent = '♡';
+  } else {
+    favorites.push(id);
+    btn.classList.add('active');
+    btn.textContent = '♥';
+  }
+  localStorage.setItem('immo-favs', JSON.stringify(favorites));
+  document.getElementById('fav-badge').textContent = favorites.length;
+}
+
+function toggleSource(id, btn) {
+  toggleState[id] = !toggleState[id];
+  btn.classList.toggle('on');
+}
+
+function simulateRefresh() {
+  const btn = document.getElementById('refresh-btn');
+  btn.innerHTML = '<span class="spinning">↻</span> Actualisation…';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '<span>✓</span> À jour';
+    btn.style.background = 'var(--green)';
+    const now = new Date();
+    const t = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('last-sync-text').textContent = `Dernière synchro : aujourd'hui à ${t}`;
+    document.getElementById('stat-sync').textContent = `aujourd'hui à ${t}`;
+    setTimeout(() => {
+      btn.innerHTML = '<span>↻</span> Actualiser maintenant';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2000);
+  }, 2000);
+}
+
+function saveSheetId() {
+  const val = document.getElementById('sheet-id-input').value.trim();
+  if (val) {
+    localStorage.setItem('sheet-id', val);
+    alert('✅ ID sauvegardé. Reconnecte l\'app à Internet pour charger les vraies données.');
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+renderCards();
+renderSources();
+document.getElementById('fav-badge').textContent = favorites.length;
+
+const savedId = localStorage.getItem('sheet-id');
+if (savedId) document.getElementById('sheet-id-input').value = savedId;
+
+// ─── FIREBASE / NOTIFICATIONS PUSH ────────────────────────────────────────────
+
+// ⚠️ REMPLACE CES VALEURS par ta config Firebase (voir firebase-setup.md)
+const firebaseConfig = {
+  apiKey: "AIzaSyBUJUwmAALNCtlqKmz1FTBUew9Rv_0rEWo",
+  authDomain: "paris-immo-26595.firebaseapp.com",
+  projectId: "paris-immo-26595",
+  storageBucket: "paris-immo-26595.firebasestorage.app",
+  messagingSenderId: "305267172723",
+  appId: "1:305267172723:web:8b457a1bb4a7850f5d1106"
+};
+const VAPID_KEY = "TA_VAPID_KEY_ICI";
+
+async function initNotifications() {
+  // Vérification support navigateur
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+    console.log('Notifications non supportées sur ce navigateur.');
+    return;
+  }
+
+  // Enregistrement du Service Worker inline (blob URL)
+  const swCode = `
+    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+    importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+    firebase.initializeApp(${JSON.stringify(FIREBASE_CONFIG)});
+    const messaging = firebase.messaging();
+
+    // Gestion des notifs en arrière-plan
+    messaging.onBackgroundMessage(payload => {
+      const { title, body, icon } = payload.notification;
+      self.registration.showNotification(title, {
+        body,
+        icon: icon || '/icons/icon-192.png',
+        badge: '/icons/badge-72.png',
+        data: payload.data,
+        vibrate: [200, 100, 200],
+        tag: payload.data?.annonceId || 'paris-immo',
+        actions: [
+          { action: 'open', title: 'Voir l\'annonce' },
+          { action: 'dismiss', title: 'Ignorer' }
+        ]
+      });
+    });
+
+    // Clic sur la notification → ouvre l'annonce
+    self.addEventListener('notificationclick', event => {
+      event.notification.close();
+      if (event.action === 'open' || !event.action) {
+        const url = event.notification.data?.url || '/';
+        event.waitUntil(clients.openWindow(url));
+      }
+    });
+  `;
+
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(swBlob);
+
+  try {
+    const registration = await navigator.serviceWorker.register(swUrl);
+    console.log('✅ Service Worker enregistré');
+
+    // Charger Firebase SDK dynamiquement
+    await loadScript('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    const messaging = firebase.messaging();
+
+    // Demander permission notifications
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.log('Permission notifications refusée.');
+      updateNotifStatus('refusée');
+      return;
+    }
+
+    // Obtenir le token FCM
+    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+    console.log('📬 FCM Token:', token);
+    localStorage.setItem('fcm-token', token);
+
+    // S'abonner au topic via ton Apps Script (ou directement Firebase)
+    updateNotifStatus('active');
+
+    // Notifs en premier plan
+    messaging.onMessage(payload => {
+      const { title, body } = payload.notification;
+      // Affiche une notif native même si l'app est ouverte
+      new Notification(title, {
+        body,
+        icon: '/icons/icon-192.png',
+        tag: payload.data?.annonceId
+      });
+      // Ajoute l'annonce en haut de la liste si données dispo
+      if (payload.data?.annonceId) {
+        showInAppAlert(payload.notification.title, payload.notification.body, payload.data.url);
+      }
+    });
+
+  } catch(e) {
+    console.error('Erreur Service Worker / Firebase:', e);
+  }
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function updateNotifStatus(status) {
+  const pill = document.querySelector('.status-pill:first-child');
+  if (status === 'active') {
+    pill.innerHTML = '<div class="status-dot"></div><span>Notifs actives</span>';
+  } else if (status === 'refusée') {
+    pill.innerHTML = '<span style="opacity:0.5">🔕 Notifs off</span>';
+  }
+}
+
+function showInAppAlert(title, body, url) {
+  const alert = document.createElement('div');
+  alert.style.cssText = `
+    position:fixed;top:16px;left:16px;right:16px;
+    background:#1a1a1a;color:white;border-radius:14px;
+    padding:14px 16px;z-index:999;cursor:pointer;
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    animation:slideDown 0.3s ease;max-width:430px;margin:0 auto;
+  `;
+  alert.innerHTML = `
+    <div style="font-size:11px;color:#c8a96e;letter-spacing:1px;margin-bottom:4px">✦ NOUVELLE ANNONCE</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:2px">${title}</div>
+    <div style="font-size:12px;opacity:0.7">${body}</div>
+  `;
+  alert.onclick = () => { window.open(url, '_blank'); alert.remove(); };
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 6000);
+}
+
+// Lancement auto des notifications si config Firebase remplie
+if (FIREBASE_CONFIG.apiKey !== 'TON_API_KEY') {
+  initNotifications();
+} else {
+  console.log('ℹ️ Configure Firebase dans paris-immo.html pour activer les notifications push.');
+}
+</script>
+</body>
+</html>
